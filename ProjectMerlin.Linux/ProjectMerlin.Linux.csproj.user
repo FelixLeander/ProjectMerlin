@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <UnoRemoteControlPort>57606</UnoRemoteControlPort>
+    <_UnoSelectedTargetFramework>net9.0-desktop</_UnoSelectedTargetFramework>
+    <ActiveDebugProfile>ProjectMerlinLinux (Desktop)</ActiveDebugProfile>
+    <ActiveDebugFramework>net9.0-desktop</ActiveDebugFramework>
+  </PropertyGroup>
+</Project>
