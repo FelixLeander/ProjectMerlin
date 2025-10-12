@@ -11,16 +11,21 @@ using ProjectMerlin.Core.Models;
 using Serilog;
 
 namespace ProjectMerlin.Core.Business;
-public static class MonitorManager
+
+
+public sealed class MonitorManager
 {
-    private static readonly Dictionary<Guid, MonitorConfig> _monitorConfig = [];
+    /// <summary>
+    /// Contains the configuration agaainst which to check.
+    /// </summary>
+    public readonly Dictionary<Guid, MonitorConfig> _monitorConfig = [];
 
     /// <summary>
     /// Adds a new <see cref="MonitorConfig"/> to the databaase.
     /// </summary>
     /// <param name="monitorConfig"></param>
     /// <returns>A <see langword="bool"/> indicattign sucess or failure.</returns>
-    public static bool Add(MonitorConfig monitorConfig)
+    public bool Add(MonitorConfig monitorConfig)
     {
         try
         {
@@ -41,7 +46,7 @@ public static class MonitorManager
     /// <summary>
     /// Loads the current config into memory.
     /// </summary>
-    public static bool LoadSavedConfigToMemory()
+    public bool LoadSavedConfigToMemory()
     {
         try
         {
@@ -50,7 +55,9 @@ public static class MonitorManager
 
             // Since we work with a local db and datasets are expected to be very small, everthying is preloaded.
             using var conext = new ApplicationContext();
-            var monitorConfigs = conext.MonitorConfigs.Include(i => i.TriggerActions).ToArray();
+            var monitorConfigs = conext.MonitorConfigs
+                .Include(i => i.TriggerActions)
+                .ToArray();
 
             foreach (var monitorConfig in conext.MonitorConfigs)
             {
@@ -58,6 +65,7 @@ public static class MonitorManager
                 {
                     Helper.Logger.Warning("Could not add {config} with {key} to memory. Pelase check for duplciattes.",
                         nameof(MonitorConfig), monitorConfig.Id);
+
                     return false;
                 }
             }
