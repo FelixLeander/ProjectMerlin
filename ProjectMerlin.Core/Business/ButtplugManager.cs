@@ -10,6 +10,7 @@ using Buttplug.Core.Messages;
 using Serilog.Events;
 
 namespace ProjectMerlin.Core.Business;
+
 public sealed class ButtplugManager
 {
     private readonly ButtplugClient _buttplugClient = new(nameof(ProjectMerlin));
@@ -33,11 +34,8 @@ public sealed class ButtplugManager
 
             ObservableCollection<ButtplugClientDevice> devices = new(_buttplugClient.Devices);
             Helper.Logger.Verbose("Inital connected devices {connected}.", devices.Count);
-            for (int i = 0; i < devices.Count; i++)
-            {
-                var device = devices[i];
+            foreach (var device in devices)
                 Helper.Logger.Verbose("Device: '{deviceName}' '{deviceInedx}'.", device.Name, device.Index);
-            }
 
             _buttplugClient.DeviceAdded += (_, e) =>
             {
@@ -64,7 +62,7 @@ public sealed class ButtplugManager
     /// </summary>
     /// <param name="cancellationToken">An optinal <see cref="CancellationToken"/> to force stop scanning.</param>
     /// <returns>A <see cref="Task"/> representing this Methods work.</returns>
-    public async Task StartScaanningAsync(CancellationToken cancellationToken = new())
+    public async Task StartScaanningAsync(CancellationToken cancellationToken = default)
     {
         try
         {

@@ -8,7 +8,6 @@ using System.Threading.Tasks.Dataflow;
 using Microsoft.EntityFrameworkCore;
 using ProjectMerlin.Core.Data;
 using ProjectMerlin.Core.Models;
-using Serilog;
 
 namespace ProjectMerlin.Core.Business;
 
@@ -16,12 +15,16 @@ namespace ProjectMerlin.Core.Business;
 public sealed class MonitorManager
 {
     /// <summary>
-    /// Contains the configuration agaainst which to check.
+    /// Contains a collection of configurations.
     /// </summary>
-    public readonly Dictionary<Guid, MonitorConfig> _monitorConfig = [];
+    /// <remarks>
+    /// Note, that this instance might be overwritten.
+    /// So you should'n keeep a reference to the instance.
+    /// </remarks>
+    public Dictionary<int, MonitorConfig> MonitorConfig { get; private set; } = [];
 
     /// <summary>
-    /// Adds a new <see cref="MonitorConfig"/> to the databaase.
+    /// Adds a new <see cref="Models.MonitorConfig"/> to the databaase.
     /// </summary>
     /// <param name="monitorConfig"></param>
     /// <returns>A <see langword="bool"/> indicattign sucess or failure.</returns>
@@ -29,7 +32,7 @@ public sealed class MonitorManager
     {
         try
         {
-            Helper.Logger.Verbose("Adding {config}.", nameof(MonitorConfig));
+            Helper.Logger.Verbose("Adding {config}.", nameof(Models.MonitorConfig));
             using var conext = new ApplicationContext();
             conext.MonitorConfigs.Add(monitorConfig);
 
@@ -38,45 +41,36 @@ public sealed class MonitorManager
         }
         catch (Exception ex)
         {
-            Helper.Logger.Error(ex, "Error adding {config}.", nameof(MonitorConfig));
+            Helper.Logger.Error(ex, "Error adding {config}.", nameof(Models.MonitorConfig));
             return false;
         }
     }
 
     /// <summary>
-    /// Loads the current config into memory.
+    /// Loads the configs from the database to memory.
     /// </summary>
-    public bool LoadSavedConfigToMemory()
+    /// <exception cref="Exception">See <see cref="Exception.InnerException"/>.</exception>
+    public void LoadSavedConfigFromDatabase()
     {
         try
         {
-            Helper.Logger.Verbose("Loading {config} from database into memory.", nameof(MonitorConfig));
-            _monitorConfig.Clear();
+            Helper.Logger.Verbose("Loading {config} from database into memory.", nameof(Models.MonitorConfig));
 
             // Since we work with a local db and datasets are expected to be very small, everthying is preloaded.
             using var conext = new ApplicationContext();
-            var monitorConfigs = conext.MonitorConfigs
+            MonitorConfig = conext.MonitorConfigs
+                .AsNoTracking()
                 .Include(i => i.TriggerActions)
-                .ToArray();
+                .Select(s => KeyValuePair.Create(s.ArgbColor, s))
+                .ToDictionary();
 
-            foreach (var monitorConfig in conext.MonitorConfigs)
-            {
-                if (!_monitorConfig.TryAdd(monitorConfig.Id, monitorConfig))
-                {
-                    Helper.Logger.Warning("Could not add {config} with {key} to memory. Pelase check for duplciattes.",
-                        nameof(MonitorConfig), monitorConfig.Id);
-
-                    return false;
-                }
-            }
-
-            Helper.Logger.Verbose("Sucessfully loaded into {config} from database into memory.", nameof(MonitorConfig));
-            return true;
+            Helper.Logger.Verbose("Sucessfully loaded into {config} from database into memory.", nameof(Models.MonitorConfig));
         }
         catch (Exception ex)
         {
-            Helper.Logger.Error(ex, "Error loading config into memory.");
-            return false;
+            const string error = "Could not load saved config from the database.";
+            Helper.Logger.Error(ex, error);
+            throw new Exception(error, ex);
         }
     }
 }
