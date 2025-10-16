@@ -1,4 +1,4 @@
-namespace ProjectMerlin.Linux;
+namespace ProjectMerlin.Linux.Ui;
 
 public sealed partial class MainPage : Page
 {

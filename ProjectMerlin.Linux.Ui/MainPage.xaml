@@ -1,7 +1,7 @@
-﻿<Page x:Class="ProjectMerlin.Linux.MainPage"
+﻿<Page x:Class="ProjectMerlin.Linux.Ui.MainPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:local="using:ProjectMerlin.Linux"
+      xmlns:local="using:ProjectMerlin.Linux.Ui"
       xmlns:utu="using:Uno.Toolkit.UI"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
   <ScrollViewer IsTabStop="True">

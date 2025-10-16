@@ -1,4 +1,4 @@
-<Application x:Class="ProjectMerlin.Linux.App"
+<Application x:Class="ProjectMerlin.Linux.Ui.App"
        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 

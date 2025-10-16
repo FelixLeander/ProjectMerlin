@@ -7,7 +7,7 @@ namespace ProjectMerlin.Core.Business;
 public static class Helper
 {
     /// <summary>
-    /// The logger used for the internaal logic.
+    /// The logger used for the internal logic.
     /// </summary>
     public static ILogger Logger { get; set; } =
         new LoggerConfiguration()

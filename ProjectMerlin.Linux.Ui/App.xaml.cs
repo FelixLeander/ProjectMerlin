@@ -2,7 +2,7 @@ using System;
 using Microsoft.Extensions.Logging;
 using Uno.Resizetizer;
 
-namespace ProjectMerlin.Linux;
+namespace ProjectMerlin.Linux.Ui;
 
 public partial class App : Application
 {

@@ -1,6 +1,6 @@
 using Uno.UI.Hosting;
 
-namespace ProjectMerlin.Linux.Platforms.Desktop;
+namespace ProjectMerlin.Linux.Ui.Platforms.Desktop;
 
 internal static class Program
 {

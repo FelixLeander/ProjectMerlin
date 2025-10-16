@@ -8,11 +8,18 @@ using System.Threading.Tasks;
 
 namespace ProjectMerlin.Core.Models;
 
+/// <summary>
+/// The action that occurs when a <see cref="MonitorConfig"/> reports a positive.
+/// </summary>
 [Table(nameof(TriggerAction))]
 public sealed class TriggerAction
 {
-    [Key]
-    public Guid Id { get; init; }
-    public required string Name { get; init; }
-    public int TargetDevice {  get; init; }
+    /// <summary>The PK/UI/ID...</summary>
+    [Key] public Guid Id { get; init; }
+
+    /// <summary> The human-readable name, displayed to the user.</summary>
+    [MaxLength(100)] public string Name { get; init; } = string.Empty;
+    
+    //TODO-Felix: Find out how to map devices.
+    public int TargetDevice { get; init; }
 }

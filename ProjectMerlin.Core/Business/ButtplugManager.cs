@@ -11,58 +11,81 @@ using Serilog.Events;
 
 namespace ProjectMerlin.Core.Business;
 
-public sealed class ButtplugManager
+/// <summary>
+/// This class handles all communication with the IntiFace-Central-Server.
+/// </summary>
+/// <param name="clientName">The Name this instance will use to communicate with IntiFace-Central.</param>
+/// <param name="addRandomPostfix">Controls if a bas64 encoded <see cref="Guid"/> should be added as postfix (seperated by a dash).
+/// Example.: MyAppName-6a7960ce21a44dafb079c018bf557da5</param>
+public sealed class ButtplugManager(string clientName = nameof(ProjectMerlin), bool addRandomPostfix = true)
 {
-    private readonly ButtplugClient _buttplugClient = new(nameof(ProjectMerlin));
+    /// <summary>
+    /// Gets the Name used to connect to IntiFace-Central-Server.
+    /// </summary>
+    /// <remarks>Can only be set via. The <see cref="ButtplugManager"/> constructor.</remarks>
+    public string ClientName => _buttplugClient.Name;
 
     /// <summary>
-    /// Connectts to the server, which manages the devices.
+    /// The true heart of this project.
+    /// Thanks to you guys, I don't have to deal with this.
+    /// Thanks to that, I can concentrate on the truly important stuff; developing this.
     /// </summary>
-    /// <param name="domain">The address to connect to.</param>
+    private readonly ButtplugClient _buttplugClient =
+        new ButtplugClient(addRandomPostfix
+            ? clientName
+            : $"{clientName}-{Guid.NewGuid():n}"
+        );
+
+
+    /// <summary>
+    /// Connects to the server, which manages the devices.
+    /// </summary>
+    /// <param name="uri">The address where IntiFace-Central is served.</param>
     /// <returns>An <see cref="ObservableCollection{T}"/> containing <see cref="ButtplugClientDevice"/>.</returns>
     /// <remarks>https://intiface.com/central/</remarks>
-    public async Task<ObservableCollection<ButtplugClientDevice>?> ConnectToServerAsync(string domain = "127.0.0.1:12345")
+    /// <exception cref="Exception">Check the inner exception.</exception>
+    public async Task<IReadOnlyCollection<ButtplugClientDevice>?> ConnectToServerAsync(
+        string uri = "ws://127.0.0.1:12345")
     {
         try
         {
-            var url = $"ws://{domain}";
-            var connector = new ButtplugWebsocketConnector(new(url));
+            var connector = new ButtplugWebsocketConnector(new(uri));
 
-            Helper.Logger.Verbose("Connecting to server at '{address}'.", url);
+            Helper.Logger.Verbose("Connecting to server at '{address}'.", uri);
             await _buttplugClient.ConnectAsync(connector);
-            Helper.Logger.Information("Connecting to server at '{address}'.", url);
+            Helper.Logger.Information("Connecting to server at '{address}'.", uri);
 
-            ObservableCollection<ButtplugClientDevice> devices = new(_buttplugClient.Devices);
-            Helper.Logger.Verbose("Inital connected devices {connected}.", devices.Count);
-            foreach (var device in devices)
-                Helper.Logger.Verbose("Device: '{deviceName}' '{deviceInedx}'.", device.Name, device.Index);
+            var observableDevices = new ObservableCollection<ButtplugClientDevice>(_buttplugClient.Devices);
+            Helper.Logger.Verbose("Initial connected devices {connected}.", observableDevices.Count);
+            foreach (var device in observableDevices)
+                Helper.Logger.Verbose("Device: '{deviceName}' '{deviceIndex}'.", device.Name, device.Index);
 
             _buttplugClient.DeviceAdded += (_, e) =>
             {
-                Helper.Logger.Verbose("Adding device '{deviceName}' '{deviceInedx}'.", e.Device.Name, e.Device.Index);
-                devices.Add(e.Device);
+                Helper.Logger.Verbose("Adding device '{deviceName}' '{deviceIndex}'.", e.Device.Name, e.Device.Index);
+                observableDevices.Add(e.Device);
             };
             _buttplugClient.DeviceRemoved += (_, e) =>
             {
-                Helper.Logger.Verbose("Adding devices '{deviceName}' '{deviceInedx}'.", e.Device.Name, e.Device.Index);
-                devices.Remove(e.Device);
+                Helper.Logger.Verbose("Adding devices '{deviceName}' '{deviceIndex}'.", e.Device.Name, e.Device.Index);
+                observableDevices.Remove(e.Device);
             };
 
-            return devices;
+            return observableDevices;
         }
         catch (Exception ex)
         {
             Helper.Logger.Error(ex, "Error connecting to server.");
-            return null;
+            throw new Exception("Connecting to server failed.", ex);
         }
     }
 
     /// <summary>
     /// Starts scanning for devices.
     /// </summary>
-    /// <param name="cancellationToken">An optinal <see cref="CancellationToken"/> to force stop scanning.</param>
+    /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> to force stop scanning.</param>
     /// <returns>A <see cref="Task"/> representing this Methods work.</returns>
-    public async Task StartScaanningAsync(CancellationToken cancellationToken = default)
+    public async Task StartScanningAsync(CancellationToken cancellationToken = default)
     {
         try
         {
