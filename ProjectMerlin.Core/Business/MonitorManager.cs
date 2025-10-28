@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
@@ -18,53 +19,68 @@ public sealed class MonitorManager
     /// <summary>
     /// Contains the <see cref="MonitorConfig"/>s which have <see cref="MonitorConfig.IsEnabled"/> set to <see langword="true"/>.
     /// </summary>
-    private readonly Dictionary<int, MonitorConfig> _monitoringConfig = new();
-
-    /// <summary>
-    /// Adds a new <see cref="Models.MonitorConfig"/> to the database.
-    /// </summary>
-    /// <param name="monitorConfig"></param>
-    /// <returns>A <see langword="bool"/> indicattign success or failure.</returns>
-    public bool Add(MonitorConfig monitorConfig)
-    {
-        try
-        {
-            Helper.Logger.Verbose("Adding {config}.", nameof(Models.MonitorConfig));
-            using var context = new DatabaseManager();
-            context.MonitorConfigs.Add(monitorConfig);
-
-            return context.SaveChanges() > 0;
-        }
-        catch (Exception ex)
-        {
-            Helper.Logger.Error(ex, "Error adding {config}.", nameof(Models.MonitorConfig));
-            return false;
-        }
-    }
+    private List<MonitorConfig> _monitoringConfig = [];
 
     /// <summary>
     /// Loads the configs from the database to memory.
     /// </summary>
     /// <exception cref="Exception">See <see cref="Exception.InnerException"/>.</exception>
-    public async Task LoadMonitorConfigFromDatabase()
+    public async Task LoadConfigAsync()
     {
         try
         {
             Helper.Logger.Verbose("Loading {config} from database into memory.", nameof(MonitorConfig));
 
-            var monitorConfigs = await DatabaseManager.LoadMonitorConfigAsync();
-            _monitoringConfig.Clear();
-            if (monitorConfigs.Any(monitorConfig => _monitoringConfig.TryAdd(monitorConfig.ArgbColor, monitorConfig)))
-                throw new Exception("Monitor config already exists. Is the database corrupt? Check for duplicates.");
+            _monitoringConfig = await DatabaseManager.LoadMonitorConfigAsync();
         }
         catch (Exception ex)
         {
-            _monitoringConfig.Clear();
-            const string error =
-                "Could not load saved config from the database. To prevent corruption, internal data has been cleared.";
-
+            const string error = "Could not load saved config from the database. To prevent corruption, internal data has been cleared.";
             Helper.Logger.Error(ex, error);
             throw new Exception(error, ex);
+        }
+    }
+
+    public IReadOnlyList<MonitorConfig> GetMatching(Color color)
+    {
+        return [.. _monitoringConfig.Where(f => ColorSimilarity(f.Color, color) > f.Threhshold)];
+
+        static double ColorSimilarity(Color c1, Color c2)
+        {
+            int rDiff = c1.R - c2.R;
+            int gDiff = c1.G - c2.G;
+            int bDiff = c1.B - c2.B;
+
+            double distance = Math.Sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+            double maxDistance = Math.Sqrt(255 * 255 * 3);
+
+            // normalize: 1.0 = identical, 0.0 = opposite
+            var result = 1.0 - (distance / maxDistance);
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Adds a new <see cref="MonitorConfig"/> to the database.
+    /// </summary>
+    /// <param name="monitorConfig"></param>
+    /// <returns>A <see langword="bool"/> indicattign success or failure.</returns>
+    public bool AddMonitorConfig(params MonitorConfig[] monitorConfig)
+    {
+        try
+        {
+            Helper.Logger.Verbose("Adding {count} '{config}'s.", monitorConfig.Length, nameof(MonitorConfig));
+            using var context = new DatabaseManager();
+            context.MonitorConfigs.AddRange(monitorConfig);
+
+            var changes = context.SaveChanges();
+            Helper.Logger.Verbose("Saved {amount} changes.", changes);
+            return changes > 0;
+        }
+        catch (Exception ex)
+        {
+            Helper.Logger.Error(ex, "Error adding {config}.", nameof(MonitorConfig));
+            return false;
         }
     }
 }

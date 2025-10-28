@@ -30,8 +30,9 @@ public sealed class ButtplugManager(string clientName = nameof(ProjectMerlin), b
     /// Thanks to you guys, I don't have to deal with this.
     /// Thanks to that, I can concentrate on the truly important stuff; developing this.
     /// </summary>
-    private readonly ButtplugClient _buttplugClient =
-        new ButtplugClient(addRandomPostfix
+    private readonly ButtplugClient _buttplugClient = new
+        (
+            addRandomPostfix
             ? clientName
             : $"{clientName}-{Guid.NewGuid():n}"
         );
@@ -44,8 +45,7 @@ public sealed class ButtplugManager(string clientName = nameof(ProjectMerlin), b
     /// <returns>An <see cref="ObservableCollection{T}"/> containing <see cref="ButtplugClientDevice"/>.</returns>
     /// <remarks>https://intiface.com/central/</remarks>
     /// <exception cref="Exception">Check the inner exception.</exception>
-    public async Task<IReadOnlyCollection<ButtplugClientDevice>?> ConnectToServerAsync(
-        string uri = "ws://127.0.0.1:12345")
+    public async Task<IReadOnlyCollection<ButtplugClientDevice>?> ConnectToServerAsync(string uri = "ws://127.0.0.1:12345")
     {
         try
         {

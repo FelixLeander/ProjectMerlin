@@ -14,11 +14,17 @@ namespace ProjectMerlin.Core.Models;
 [Table(nameof(TriggerAction))]
 public sealed class TriggerAction
 {
-    /// <summary>The PK/UI/ID...</summary>
-    [Key] public Guid Id { get; init; }
+    /// <summary>
+    /// The PK/UI/ID...
+    /// </summary>
+    [Key]
+    public Guid Id { get; init; }
 
-    /// <summary> The human-readable name, displayed to the user.</summary>
-    [MaxLength(100)] public string Name { get; init; } = string.Empty;
+    /// <summary>
+    /// The human-readable name, displayed to the user.
+    /// </summary>
+    [MaxLength(100)]
+    public string Name { get; init; } = string.Empty;
     
     //TODO-Felix: Find out how to map devices.
     public int TargetDevice { get; init; }

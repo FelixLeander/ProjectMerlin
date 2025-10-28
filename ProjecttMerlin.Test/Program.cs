@@ -1,8 +1,12 @@
-﻿using ProjectMerlin.Core.Business;
+using System.Runtime.InteropServices;
+using ProjectMerlin.Core.Business;
+
+DatabaseManager.Reset();
+
+var monitorManager = new MonitorManager();
+monitorManager.AddMonitorConfig
 
 var bpm = new ButtplugManager("TestName", true);
-Console.WriteLine($"Starting as '{bpm.ClientName}'");
-
 var devices = await bpm.ConnectToServerAsync();
 if (devices == null)
 {
@@ -10,9 +14,11 @@ if (devices == null)
     return 1;
 }
 
+await bpm.StartScanningAsync();
 
-var monitorManager = new MonitorManager();
-var config = monitorManager.LoadMonitorConfigFromDatabase();
-
+while (true)
+{
+    Console.ReadLine();
+}
 
 return 0;
