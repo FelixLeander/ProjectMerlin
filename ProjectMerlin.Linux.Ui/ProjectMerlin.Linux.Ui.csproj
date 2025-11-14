@@ -26,6 +26,8 @@
             Toolkit;
             MVUX;
         </UnoFeatures>
+        <Configurations>Debug;Release;linux-x64</Configurations>
+        <Platforms>AnyCPU;linux-x64</Platforms>
     </PropertyGroup>
 
 </Project>

@@ -2,6 +2,6 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <UnoPlatformIDE>rider</UnoPlatformIDE>
-    <UnoRemoteControlPort>35905#</UnoRemoteControlPort>
+    <UnoRemoteControlPort>33253#</UnoRemoteControlPort>
   </PropertyGroup>
 </Project>
