@@ -1,6 +1,9 @@
+using System.Globalization;
+using System.Numerics;
 using ProjectMerlin.Cli.Enums;
 using ProjectMerlin.Core.Business;
 using ProjectMerlin.Core.Models;
+using SQLitePCL;
 
 namespace ProjectMerlin.Cli.Business;
 
@@ -50,25 +53,33 @@ public static class Interactive
         }
     }
 
-    private static MonitorConfig? CreateConfig()
+    private static MonitorConfig? CreateConfig() 
     {
-        var texts = new string[] { "EnterValue1", "EnterValue2", "EnterValue3" };
+        var texts = new[] { "Position X", "Position Y", "Target ARGB", "Percentage diff (0.9 == 90%)" };
         var list = new List<int>();
         foreach (var text in texts)
         {
-            var result = GetInt(text);
+            var result = GeValue(text);
             if (result == null)
                 break;
-            list.Add(result);
+            list.Add(result ?? 0);
         }
 
-        return null;
+        var monitorConfig = new MonitorConfig()
+        {
+            PosX = list[0],
+            PosY = list[1],
+            ArgbInt = list[2],
+            Threhshold = list[3],
+        };
+
+        return monitorConfig;
     }
 
-    private static int? GetInt(string text)
+    private static T? GeValue<T>(string text) where T : struct, INumberBase<T>
     {
         Console.WriteLine(text);
         var rawInput = Console.ReadLine();
-        return int.TryParse(rawInput, out var result) ? result : null;
+        return T.TryParse(rawInput, CultureInfo.InvariantCulture,  out var result) ? result : null;
     }
 }
