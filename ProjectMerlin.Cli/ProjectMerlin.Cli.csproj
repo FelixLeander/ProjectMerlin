@@ -11,4 +11,8 @@
       <ProjectReference Include="..\ProjectMerlin.Core\ProjectMerlin.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Models\" />
+    </ItemGroup>
+
 </Project>

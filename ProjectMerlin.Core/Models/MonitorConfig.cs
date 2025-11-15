@@ -24,7 +24,7 @@ public sealed class MonitorConfig
 
     public int PosX { get; init; }
     public int PosY { get; init; }
-    public required int ArgbColor { get; init; }
+    public int ArgbColor { get; init; }
     public double Threhshold { get; init; }
 
     [NotMapped]
