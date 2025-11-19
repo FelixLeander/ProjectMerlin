@@ -24,11 +24,11 @@ public sealed class MonitorConfig
 
     public int PosX { get; init; }
     public int PosY { get; init; }
-    public required int ArgbColor { get; init; }
+    public int ArgbInt { get; init; }
     public double Threhshold { get; init; }
 
     [NotMapped]
-    public Color Color { get => field == default ? Color.FromArgb(ArgbColor) : field; set; }
+    public Color Color { get => field == default ? Color.FromArgb(ArgbInt) : field; set; }
 
 
     /// <summary> Navigation property, by convention.</summary>

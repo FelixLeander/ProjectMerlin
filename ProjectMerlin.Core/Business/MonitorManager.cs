@@ -35,7 +35,8 @@ public sealed class MonitorManager
         }
         catch (Exception ex)
         {
-            const string error = "Could not load saved config from the database. To prevent corruption, internal data has been cleared.";
+            const string error =
+                "Could not load saved config from the database. To prevent corruption, internal data has been cleared.";
             Helper.Logger.Error(ex, error);
             throw new Exception(error, ex);
         }
@@ -47,12 +48,12 @@ public sealed class MonitorManager
 
         static double ColorSimilarity(Color c1, Color c2)
         {
-            int rDiff = c1.R - c2.R;
-            int gDiff = c1.G - c2.G;
-            int bDiff = c1.B - c2.B;
+            var rDiff = c1.R - c2.R;
+            var gDiff = c1.G - c2.G;
+            var bDiff = c1.B - c2.B;
 
-            double distance = Math.Sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
-            double maxDistance = Math.Sqrt(255 * 255 * 3);
+            var distance = Math.Sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+            var maxDistance = Math.Sqrt(255 * 255 * 3);
 
             // normalize: 1.0 = identical, 0.0 = opposite
             var result = 1.0 - (distance / maxDistance);
@@ -65,8 +66,11 @@ public sealed class MonitorManager
     /// </summary>
     /// <param name="monitorConfig"></param>
     /// <returns>A <see langword="bool"/> indicattign success or failure.</returns>
-    public bool AddMonitorConfig(params MonitorConfig[] monitorConfig)
+    public static void AddMonitorConfig(params MonitorConfig[] monitorConfig)
     {
+        if (monitorConfig.Length == 0)
+            throw new ArgumentException("MonitorConfig must have at least one config.", nameof(monitorConfig));
+
         try
         {
             Helper.Logger.Verbose("Adding {count} '{config}'s.", monitorConfig.Length, nameof(MonitorConfig));
@@ -75,12 +79,11 @@ public sealed class MonitorManager
 
             var changes = context.SaveChanges();
             Helper.Logger.Verbose("Saved {amount} changes.", changes);
-            return changes > 0;
         }
         catch (Exception ex)
         {
             Helper.Logger.Error(ex, "Error adding {config}.", nameof(MonitorConfig));
-            return false;
+            throw new Exception($"Could not add new {nameof(monitorConfig)}", ex);
         }
     }
 }
