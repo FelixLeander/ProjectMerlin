@@ -1,4 +1,4 @@
-﻿using ProjectMerlin.Cli.Business;
+using ProjectMerlin.Cli.Business;
 using ProjectMerlin.Cli.Enums;
 using ProjectMerlin.Core;
 

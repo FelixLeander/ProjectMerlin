@@ -3,7 +3,6 @@ using System.Numerics;
 using ProjectMerlin.Cli.Enums;
 using ProjectMerlin.Core.Business;
 using ProjectMerlin.Core.Models;
-using SQLitePCL;
 
 namespace ProjectMerlin.Cli.Business;
 
