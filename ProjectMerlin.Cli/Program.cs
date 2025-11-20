@@ -1,10 +1,8 @@
 using ProjectMerlin.Cli.Business;
-using ProjectMerlin.Cli.Enums;
-using ProjectMerlin.Core;
 
 try
 {
-    return await Interactive.MainMenuAsync();
+    return await ConsoleMenues.MainMenuAsync();
 }
 catch (Exception ex)
 {

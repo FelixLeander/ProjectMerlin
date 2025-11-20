@@ -1,12 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
-using Microsoft.EntityFrameworkCore;
+using ProjectMerlin.Core.Abstraction;
 using ProjectMerlin.Core.Models;
 
 namespace ProjectMerlin.Core.Business;
@@ -25,7 +18,7 @@ public sealed class MonitorManager
     /// Loads the configs from the database to memory.
     /// </summary>
     /// <exception cref="Exception">See <see cref="Exception.InnerException"/>.</exception>
-    public async Task LoadConfigAsync()
+    public async Task InittalizeAsync()
     {
         try
         {
@@ -42,22 +35,22 @@ public sealed class MonitorManager
         }
     }
 
-    public IReadOnlyList<MonitorConfig> GetMatching(Color color)
+    public async Task Run(IPixelProvider pixelProvider)
     {
-        return [.. _monitoringConfig.Where(f => ColorSimilarity(f.Color, color) > f.Threhshold)];
-
-        static double ColorSimilarity(Color c1, Color c2)
+        while (true)
         {
-            var rDiff = c1.R - c2.R;
-            var gDiff = c1.G - c2.G;
-            var bDiff = c1.B - c2.B;
+            var color = pixelProvider.MatchesMonitorColor();
+            var matches = GetMatching(color);
+            foreach (var match in matches)
+            {
+                pixelProvider.MatchesMonitorColor();
+                foreach (var triggerAction in match.TriggerActions)
+                {
 
-            var distance = Math.Sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
-            var maxDistance = Math.Sqrt(255 * 255 * 3);
+                }
+            }
 
-            // normalize: 1.0 = identical, 0.0 = opposite
-            var result = 1.0 - (distance / maxDistance);
-            return result;
+            await Task.Delay(500);
         }
     }
 
@@ -84,6 +77,31 @@ public sealed class MonitorManager
         {
             Helper.Logger.Error(ex, "Error adding {config}.", nameof(MonitorConfig));
             throw new Exception($"Could not add new {nameof(monitorConfig)}", ex);
+        }
+    }
+
+    public IReadOnlyList<MonitorConfig> GetMatching(IPixelProvider pixelProvider)
+    {
+        return [.. _monitoringConfig.Where(f => {
+            //TODO: The pixel provider should not do the filtering.
+            var color = pixelProvider.MatchesMonitorColor(f);
+            if (color is not { } nonNull)
+                return false;
+            return ColorSimilarity(f.Color, nonNull) > f.Threhshold;
+        })];
+
+        static double ColorSimilarity(Color c1, Color c2)
+        {
+            var rDiff = c1.R - c2.R;
+            var gDiff = c1.G - c2.G;
+            var bDiff = c1.B - c2.B;
+
+            var distance = Math.Sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+            var maxDistance = Math.Sqrt(255 * 255 * 3);
+
+            // normalize: 1.0 = identical, 0.0 = opposite
+            var result = 1.0 - (distance / maxDistance);
+            return result;
         }
     }
 }

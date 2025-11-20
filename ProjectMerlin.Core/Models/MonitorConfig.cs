@@ -9,7 +9,7 @@ namespace ProjectMerlin.Core.Models;
 /// Contains the data required to setup a monitor.
 /// </summary>
 [Table(nameof(MonitorConfig))]
-public sealed class MonitorConfig
+public class MonitorConfig
 {
     /// <summary>
     /// The PK/UI/ID...
@@ -19,13 +19,21 @@ public sealed class MonitorConfig
 
     /// <summary> The human-readable name, displayed to the user.</summary>
     [MaxLength(100)]
+    [Required]
     public string Name { get; init; } = string.Empty;
+
     public bool IsEnabled { get; init; }
 
+    [Required]
     public int PosX { get; init; }
+
+    [Required]
     public int PosY { get; init; }
+
+    [Required]
     public int ArgbInt { get; init; }
-    public double Threhshold { get; init; }
+
+    public double Threhshold { get; init; } = 0.80;
 
     [NotMapped]
     public Color Color { get => field == default ? Color.FromArgb(ArgbInt) : field; set; }

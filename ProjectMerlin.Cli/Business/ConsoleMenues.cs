@@ -1,12 +1,13 @@
 using System.Globalization;
 using System.Numerics;
 using ProjectMerlin.Cli.Enums;
+using ProjectMerlin.Cli.Linux;
 using ProjectMerlin.Core.Business;
 using ProjectMerlin.Core.Models;
 
 namespace ProjectMerlin.Cli.Business;
 
-public static class Interactive
+public static class ConsoleMenues
 {
     internal static async Task<int> MainMenuAsync()
     {
@@ -34,7 +35,7 @@ public static class Interactive
                     return 0;
 
                 case MainMenuOptions.Configure:
-                    var monitorConfig = CreateConfig();
+                    var monitorConfig = Helper.PopulateInstanceFromConsole<MonitorConfig>();
                     if (monitorConfig == null)
                         return 3;
                     MonitorManager.AddMonitorConfig(monitorConfig);
@@ -42,7 +43,8 @@ public static class Interactive
 
                 case MainMenuOptions.Run:
                     var monitorManager = new MonitorManager();
-                    await monitorManager.LoadConfigAsync();
+                    await monitorManager.InittalizeAsync();
+                    await monitorManager.Run(new LinuxGrep());
                     break;
 
                 default:
@@ -50,35 +52,5 @@ public static class Interactive
                     return 2;
             }
         }
-    }
-
-    private static MonitorConfig? CreateConfig() 
-    {
-        var texts = new[] { "Position X", "Position Y", "Target ARGB", "Percentage diff (0.9 == 90%)" };
-        var list = new List<int>();
-        foreach (var text in texts)
-        {
-            var result = GeValue(text);
-            if (result == null)
-                break;
-            list.Add(result ?? 0);
-        }
-
-        var monitorConfig = new MonitorConfig()
-        {
-            PosX = list[0],
-            PosY = list[1],
-            ArgbInt = list[2],
-            Threhshold = list[3],
-        };
-
-        return monitorConfig;
-    }
-
-    private static T? GeValue<T>(string text) where T : struct, INumberBase<T>
-    {
-        Console.WriteLine(text);
-        var rawInput = Console.ReadLine();
-        return T.TryParse(rawInput, CultureInfo.InvariantCulture,  out var result) ? result : null;
     }
 }

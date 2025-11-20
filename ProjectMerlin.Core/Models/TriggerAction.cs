@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProjectMerlin.Core.Models;
 
@@ -25,7 +20,12 @@ public sealed class TriggerAction
     /// </summary>
     [MaxLength(100)]
     public string Name { get; init; } = string.Empty;
-    
-    //TODO-Felix: Find out how to map devices.
+
     public int TargetDevice { get; init; }
+
+    public int MotorId { get; init; }
+
+    public double Intensity { get; init; }
+
+    public int Duration { get; init; }
 }

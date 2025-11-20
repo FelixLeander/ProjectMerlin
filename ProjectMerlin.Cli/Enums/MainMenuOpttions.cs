@@ -1,4 +1,4 @@
-namespace ProjectMerlin.Cli.Enums;
+﻿namespace ProjectMerlin.Cli.Enums;
 
 public enum MainMenuOptions
 {
