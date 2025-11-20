@@ -37,7 +37,8 @@ internal static class Helper
 
                 try
                 {
-                    pi.SetValue(instance, input);
+                    var value = Convert.ChangeType(input, pi.PropertyType);
+                    pi.SetValue(instance, value);
                     break;
                 }
                 catch
