@@ -39,16 +39,10 @@ public sealed class MonitorManager
     {
         while (true)
         {
-            var color = pixelProvider.MatchesMonitorColor();
-            var matches = GetMatching(color);
+            var matches = GetMatching(pixelProvider);
             foreach (var match in matches)
-            {
-                pixelProvider.MatchesMonitorColor();
                 foreach (var triggerAction in match.TriggerActions)
-                {
-
-                }
-            }
+                    triggerAction.Execute();
 
             await Task.Delay(500);
         }

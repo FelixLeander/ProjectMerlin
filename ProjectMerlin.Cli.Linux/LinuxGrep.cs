@@ -8,6 +8,6 @@ public sealed class LinuxGrep : IPixelProvider
 {
     public Color? MatchesMonitorColor(MonitorConfig monitorConfig)
     {
-
+        return null;
     }
 }

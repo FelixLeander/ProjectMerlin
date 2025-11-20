@@ -28,4 +28,8 @@ public sealed class TriggerAction
     public double Intensity { get; init; }
 
     public int Duration { get; init; }
+
+    public void Execute()
+    {
+    }
 }
