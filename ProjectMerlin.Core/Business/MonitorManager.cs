@@ -78,7 +78,7 @@ public sealed class MonitorManager
     {
         return [.. _monitoringConfig.Where(f => {
             //TODO: The pixel provider should not do the filtering.
-            var color = pixelProvider.MatchesMonitorColor(f);
+            var color = pixelProvider.GetPixelColor(f);
             if (color is not { } nonNull)
                 return false;
             return ColorSimilarity(f.Color, nonNull) > f.Threhshold;
