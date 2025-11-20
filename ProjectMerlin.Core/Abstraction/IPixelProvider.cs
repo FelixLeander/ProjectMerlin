@@ -5,5 +5,5 @@ namespace ProjectMerlin.Core.Abstraction;
 
 public interface IPixelProvider
 {
-    public Color? MatchesMonitorColor(MonitorConfig monitorConfig);
+    public Color? GetPixelColor(MonitorConfig monitorConfig);
 }
