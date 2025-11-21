@@ -4,5 +4,6 @@ public enum MainMenuOptions
 {
     Exit,
     Configure,
-    Run
+    Run,
+    ResetDatabase
 }

@@ -8,17 +8,17 @@ namespace ProjectMerlin.Core.Business;
 /// </summary>
 internal sealed class DatabaseManager : DbContext
 {
-    internal DatabaseManager() { }
     internal DbSet<MonitorConfig> MonitorConfigs => Set<MonitorConfig>();
     internal DbSet<TriggerAction> TriggerActions => Set<TriggerAction>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlite($"Data Source=Database.db");
 
-    internal static void Reset()
+    internal static void Initialize(bool reset = false)
     {
         using var context = new DatabaseManager();
-        context.Database.EnsureDeleted();
+        if (reset)
+            context.Database.EnsureDeleted();
         context.Database.EnsureCreated();
     }
 
