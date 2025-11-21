@@ -1,13 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Buttplug.Client;
-using Buttplug.Core;
-using Buttplug.Core.Messages;
-using Serilog.Events;
 
 namespace ProjectMerlin.Core.Business;
 

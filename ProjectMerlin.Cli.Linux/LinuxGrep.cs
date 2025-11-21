@@ -42,7 +42,7 @@ public sealed class LinuxGrep : IPixelProvider
 
             string pixelInfo = output.Trim().ToLowerInvariant();
 
-            if (pixelInfo.StartsWith("srgb(") && pixelInfo.EndsWith(")"))
+            if (pixelInfo.StartsWith("srgb(") && pixelInfo.EndsWith(')'))
             {
                 var inner = pixelInfo[5..^1]; // content inside srgb(...)
                 var parts = inner.Split(',');
@@ -55,7 +55,7 @@ public sealed class LinuxGrep : IPixelProvider
                     return Color.FromArgb(r, g, b);
                 }
             }
-            else if (pixelInfo.StartsWith("#") && (pixelInfo.Length == 7 || pixelInfo.Length == 9))
+            else if (pixelInfo.StartsWith('#') && (pixelInfo.Length == 7 || pixelInfo.Length == 9))
             {
                 try
                 {
