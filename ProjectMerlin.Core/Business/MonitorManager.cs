@@ -82,11 +82,12 @@ public sealed class MonitorManager
     public IReadOnlyList<MonitorConfig> GetMatching(IPixelProvider pixelProvider)
     {
         return [.. _monitoringConfig.Where(f => {
-            //TODO: The pixel provider should not do the filtering.
-            var color = pixelProvider.GetPixelColor(f);
-            if (color is not { } nonNull)
-                return false;
-            return ColorSimilarity(f.Color, nonNull) > f.Threhshold;
+            if (pixelProvider.GetPixelColor(f) is { } nonNull)
+                return ColorSimilarity(f.Color, nonNull) > f.Threhshold;
+
+            var name = pixelProvider.GetType().FullName;
+            Helper.Logger.Warning("Error getting pixel at X:{x}, Y:{y} using {provider}.", f.PosX, f.PosY, name);
+            return false;
         })];
 
         static double ColorSimilarity(Color c1, Color c2)

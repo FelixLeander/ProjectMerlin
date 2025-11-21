@@ -47,7 +47,7 @@ public static class ConsoleMenues
 
                 case MainMenuOptions.ResetDatabase:
                     Console.WriteLine("Are you sure you want to reset the database? (y/N)");
-                    if (Console.ReadKey())
+                    if ("y".Equals(Console.ReadLine(), StringComparison.OrdinalIgnoreCase))
                         DatabaseManager.Initialize(true);
                     break;
 
