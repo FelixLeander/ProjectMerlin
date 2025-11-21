@@ -17,13 +17,17 @@ public sealed class MonitorManager
     /// <summary>
     /// Loads the configs from the database to memory.
     /// </summary>
+    /// <param name="resetDatabase">If <see langword="true"/> recreates the database.</param>
     /// <exception cref="Exception">See <see cref="Exception.InnerException"/>.</exception>
-    public async Task InittalizeAsync()
+    /// <returns>A task representing this work.</returns>
+    public async Task InitializeAsync(bool resetDatabase = false)
     {
         try
         {
-            Helper.Logger.Verbose("Loading {config} from database into memory.", nameof(MonitorConfig));
+            Helper.Logger.Information("Initializing database...");
+            DatabaseManager.Initialize(resetDatabase);
 
+            Helper.Logger.Verbose("Loading {config} from database into memory.", nameof(MonitorConfig));
             _monitoringConfig = await DatabaseManager.LoadMonitorConfigAsync();
         }
         catch (Exception ex)
@@ -37,6 +41,7 @@ public sealed class MonitorManager
 
     public async Task Run(IPixelProvider pixelProvider)
     {
+        Helper.Logger.Information("Running...");
         while (true)
         {
             var matches = GetMatching(pixelProvider);

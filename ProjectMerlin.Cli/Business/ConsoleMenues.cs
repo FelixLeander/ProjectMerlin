@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Numerics;
 using ProjectMerlin.Cli.Enums;
 using ProjectMerlin.Cli.Linux;
 using ProjectMerlin.Core.Business;
@@ -43,8 +41,12 @@ public static class ConsoleMenues
 
                 case MainMenuOptions.Run:
                     var monitorManager = new MonitorManager();
-                    await monitorManager.InittalizeAsync();
+                    await monitorManager.InitializeAsync();
                     await monitorManager.Run(new LinuxGrep());
+                    break;
+
+                case MainMenuOptions.ResetDatabase:
+
                     break;
 
                 default:
