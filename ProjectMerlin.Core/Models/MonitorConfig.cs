@@ -39,5 +39,6 @@ public class MonitorConfig
     public Color Color { get => field == default ? Color.FromArgb(ArgbInt) : field; set; }
 
     /// <summary> Navigation property, by convention.</summary>
+    //[Required]
     public List<TriggerAction> TriggerActions { get; init; } = [];
 }
