@@ -21,6 +21,7 @@ public class MonitorConfig
     [Required]
     public string Name { get; init; } = string.Empty;
 
+    [Required]
     public bool IsEnabled { get; init; }
 
     [Required]
