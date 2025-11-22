@@ -10,8 +10,14 @@ namespace ProjectMerlin.Core.Models;
 /// The action that occurs when a <see cref="MonitorConfig"/> reports a positive.
 /// </summary>
 [Table(nameof(TriggerAction))]
-public sealed class TriggerAction(ButtplugClientDevice? buttplugClientDevice = null)
+public sealed class TriggerAction()
 {
+    public TriggerAction(ButtplugClientDevice buttplugClientDevice) : this()
+    {
+        Device = buttplugClientDevice;
+        Name = buttplugClientDevice.Name;
+    }
+
     /// <summary>
     /// The PK/UI/ID...
     /// </summary>
@@ -22,14 +28,14 @@ public sealed class TriggerAction(ButtplugClientDevice? buttplugClientDevice = n
     /// The human-readable name, displayed to the user.
     /// </summary>
     [MaxLength(100)]
-    public string Name { get; init; } = buttplugClientDevice?.Name ?? string.Empty;
+    public string Name { get; init; } = string.Empty;
 
     public double Intensity { get; init; }
 
     public int Duration { get; init; }
 
     [NotMapped]
-    public ButtplugClientDevice? Device { get; set; } = buttplugClientDevice;
+    public ButtplugClientDevice? Device { get; set; }
     public async Task ExecuteAsync(ButtplugManager buttplugManager)
     {
         if (Device == null)

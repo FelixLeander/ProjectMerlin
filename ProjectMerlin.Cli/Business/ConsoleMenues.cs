@@ -48,9 +48,16 @@ internal static class ConsoleMenues
                     break;
 
                 case MainMenuOptions.Run:
-                    var monitorManager = new MonitorManager();
-                    await monitorManager.InitializeAsync();
-                    await monitorManager.Run(new LinuxGrep());
+                    try
+                    {
+                        var monitorManager = new MonitorManager();
+                        await monitorManager.InitializeAsync();
+                        await monitorManager.Run(new LinuxGrep());
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                     break;
 
                 case MainMenuOptions.ResetDatabase:
@@ -97,13 +104,21 @@ internal static class ConsoleMenues
                     Console.WriteLine("[DEBUG] Add testing trigger? (y/N)"); // TODO: This is a placeholer until TriggerActions are editable.
                     if ("y".Equals(Console.ReadLine(), StringComparison.OrdinalIgnoreCase))
                     {
-                        var bpm = new ButtplugManager();
-                        await bpm.ConnectToServerAsync();
+                        try
+                        {
+                            var bpm = new ButtplugManager();
+                            await bpm.ConnectToServerAsync();
 
-                        var devices = bpm.GetCurrentDevices()
-                            .Select(s => new TriggerAction(s))
-                            .ToArray();
-                        monitorConfig.TriggerActions.AddRange(devices);
+                            var devices = bpm.GetCurrentDevices()
+                                .Select(s => new TriggerAction(s))
+                                .ToArray();
+                            monitorConfig.TriggerActions.AddRange(devices);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                            Console.WriteLine("Enusre intiface is running. Get is here: https://intiface.com/central/");
+                        }
                     }
 
                     MonitorManager.AddMonitorConfig(monitorConfig);
@@ -144,6 +159,11 @@ internal static class ConsoleMenues
             Console.WriteLine($"Select an {nameof(MonitorConfig)} to delete. (Leave empty to return)");
             using var getContext = new DatabaseManager();
             var configs = getContext.MonitorConfigs.AsNoTracking().ToArray();
+            if (configs.Length == 0)
+            {
+                Console.WriteLine("There are no configs to delete.");
+                return;
+            }
 
             for (int i = 0; i < configs.Length; i++)
             {
