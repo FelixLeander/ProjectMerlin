@@ -12,7 +12,7 @@ public sealed class MonitorManager
     /// <summary>
     /// Contains the <see cref="MonitorConfig"/>s which have <see cref="MonitorConfig.IsEnabled"/> set to <see langword="true"/>.
     /// </summary>
-    private List<MonitorConfig> _monitoringConfig = [];
+    private List<MonitorConfig> _monitoringConfigs = [];
 
     /// <summary>
     /// Loads the configs from the database to memory.
@@ -28,7 +28,7 @@ public sealed class MonitorManager
             DatabaseManager.Initialize(resetDatabase);
 
             Helper.Logger.Verbose("Loading {config} from database into memory.", nameof(MonitorConfig));
-            _monitoringConfig = await DatabaseManager.LoadEnaabledMonitorConfigAsync();
+            _monitoringConfigs = await DatabaseManager.LoadEnaabledMonitorConfigAsync();
         }
         catch (Exception ex)
         {
@@ -41,6 +41,9 @@ public sealed class MonitorManager
 
     public async Task Run(IPixelProvider pixelProvider)
     {
+        if (_monitoringConfigs.Count == 0)
+            throw new Exception($"No {nameof(MonitorConfig)}s have been preloaded, add the with {nameof(AddMonitorConfig)}. Laod them with {nameof(InitializeAsync)}.");
+
         Helper.Logger.Information("Connecting...");
         var bpm = new ButtplugManager();
         await bpm.ConnectToServerAsync();
@@ -86,7 +89,7 @@ public sealed class MonitorManager
 
     public IReadOnlyList<MonitorConfig> GetMatching(IPixelProvider pixelProvider)
     {
-        return [.. _monitoringConfig.Where(f => {
+        return [.. _monitoringConfigs.Where(f => {
             if (pixelProvider.GetPixelColor(f) is { } nonNull)
                 return ColorSimilarity(f.Color, nonNull) > f.Threhshold;
 
