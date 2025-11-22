@@ -38,7 +38,7 @@ internal static class Helper
                 }
                 catch
                 {
-                    Console.WriteLine($"The value '{input}' is invalid for the type {pi.PropertyType.Name}.");
+                    Console.WriteLine($"The value '{input}' is invalid for the type {pi.PropertyType.Name}. Try again.");
                 }
             }
         }

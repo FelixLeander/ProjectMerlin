@@ -1,4 +1,4 @@
-using Buttplug.Core;
+using Buttplug.Client;
 using Microsoft.EntityFrameworkCore;
 using ProjectMerlin.Cli.Enums;
 using ProjectMerlin.Cli.Linux;
@@ -102,26 +102,30 @@ internal static class ConsoleMenues
                     var monitorConfig = Helper.PopulateInstanceFromConsole<MonitorConfig>();
 
                     Console.WriteLine("[DEBUG] Add testing trigger? (y/N)"); // TODO: This is a placeholer until TriggerActions are editable.
-                    if ("y".Equals(Console.ReadLine(), StringComparison.OrdinalIgnoreCase))
+                    if (!"y".Equals(Console.ReadLine(), StringComparison.OrdinalIgnoreCase))
+                        break;
+
+                    try
                     {
-                        try
-                        {
-                            var bpm = new ButtplugManager();
-                            await bpm.ConnectToServerAsync();
+                        var bpm = new ButtplugManager();
+                        await bpm.ConnectToServerAsync();
 
-                            var devices = bpm.GetCurrentDevices()
-                                .Select(s => new TriggerAction(s))
-                                .ToArray();
-                            monitorConfig.TriggerActions.AddRange(devices);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.Message);
-                            Console.WriteLine("Enusre intiface is running. Get is here: https://intiface.com/central/");
-                        }
+                        var devices = bpm.GetCurrentDevices()
+                            .Select(s => new TriggerAction(s))
+                            .ToArray();
+                        monitorConfig.TriggerActions.AddRange(devices);
+
+                        MonitorManager.AddMonitorConfig(monitorConfig);
                     }
-
-                    MonitorManager.AddMonitorConfig(monitorConfig);
+                    catch (ButtplugClientConnectorException ex)
+                    {
+                        Console.WriteLine("Connection to intiface failed.");
+                        Console.WriteLine("Enusre intiface is running. Get is here: https://intiface.com/central/");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Unexpected error: {ex.Message}");
+                    }
                     break;
 
                 case ConfigMenuOptions.EditMonitorConfig:
