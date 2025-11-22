@@ -113,8 +113,8 @@ internal static class ConsoleMenues
                         var devices = bpm.GetCurrentDevices()
                             .Select(s => new TriggerAction(s))
                             .ToArray();
-                        monitorConfig.TriggerActions.AddRange(devices);
 
+                        monitorConfig.TriggerActions.AddRange(devices);
                         MonitorManager.AddMonitorConfig(monitorConfig);
                     }
                     catch (ButtplugClientConnectorException ex)
@@ -160,9 +160,9 @@ internal static class ConsoleMenues
     {
         while (true)
         {
-            Console.WriteLine($"Select an {nameof(MonitorConfig)} to delete. (Leave empty to return)");
             using var getContext = new DatabaseManager();
             var configs = getContext.MonitorConfigs.AsNoTracking().ToArray();
+            Console.WriteLine($"Select an {nameof(MonitorConfig)} to delete. (Leave empty to return)");
             if (configs.Length == 0)
             {
                 Console.WriteLine("There are no configs to delete.");
@@ -176,6 +176,9 @@ internal static class ConsoleMenues
             }
 
             var rawInput = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(rawInput))
+                return;
+
             if (!int.TryParse(rawInput, out var option))
             {
                 Console.WriteLine("Invalid input.");

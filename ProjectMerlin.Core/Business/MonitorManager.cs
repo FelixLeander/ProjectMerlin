@@ -55,7 +55,7 @@ public sealed class MonitorManager
             var matches = GetMatching(pixelProvider);
             foreach (var match in matches)
                 foreach (var triggerAction in match.TriggerActions)
-                    await triggerAction.ExecuteAsync(bpm);
+                    _ = triggerAction.ExecuteAsync(bpm);
 
             await Task.Delay(500);
         }

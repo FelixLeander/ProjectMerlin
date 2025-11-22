@@ -50,8 +50,8 @@ public sealed class TriggerAction()
             Device = foundDevice;
         }
 
-        await Device.VibrateAsync(Enumerable.Repeat(Intensity, 4));
+        await Device.VibrateAsync(Intensity);
         await Task.Delay(Duration);
-        await Device.VibrateAsync(Enumerable.Repeat(0d, 4));
+        await Device.VibrateAsync(0d);
     }
 }

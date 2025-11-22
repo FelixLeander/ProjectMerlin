@@ -22,7 +22,7 @@ public class MonitorConfig
     public string Name { get; init; } = string.Empty;
 
     [Required]
-    public bool IsEnabled { get; init; }
+    public bool IsEnabled { get; init; } = true;
 
     [Required]
     public int PosX { get; init; }
