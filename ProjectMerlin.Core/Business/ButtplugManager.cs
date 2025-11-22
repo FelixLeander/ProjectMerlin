@@ -1,5 +1,7 @@
-using System.Collections.ObjectModel;
 using Buttplug.Client;
+using ProjectMerlin.Core.Models;
+using Serilog;
+using System.Collections.ObjectModel;
 
 namespace ProjectMerlin.Core.Business;
 
@@ -94,4 +96,16 @@ public sealed class ButtplugManager(string clientName = nameof(ProjectMerlin), b
             Helper.Logger.Error(ex, "Unexpected error while scanning for devices.");
         }
     }
+
+    public ButtplugClientDevice? GetMatchingDevice(TriggerAction triggerAction)
+    {
+        var device = _buttplugClient.Devices.FirstOrDefault(f => f.Name.Equals(triggerAction.Name, StringComparison.OrdinalIgnoreCase));
+        if (device == null)
+            Helper.Logger.Warning("Found no device for {trigerAction} '{name}'.", nameof(TriggerAction), triggerAction.Name);
+        else
+            Helper.Logger.Verbose("Found device {index} '{name}'.", device.Index, triggerAction.Name);
+        return device;
+    }
+
+    public ButtplugClientDevice[] GetCurrentDevices() => _buttplugClient.Devices;
 }

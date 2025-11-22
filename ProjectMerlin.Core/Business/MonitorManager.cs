@@ -28,7 +28,7 @@ public sealed class MonitorManager
             DatabaseManager.Initialize(resetDatabase);
 
             Helper.Logger.Verbose("Loading {config} from database into memory.", nameof(MonitorConfig));
-            _monitoringConfig = await DatabaseManager.LoadMonitorConfigAsync();
+            _monitoringConfig = await DatabaseManager.LoadEnaabledMonitorConfigAsync();
         }
         catch (Exception ex)
         {
@@ -41,13 +41,18 @@ public sealed class MonitorManager
 
     public async Task Run(IPixelProvider pixelProvider)
     {
-        Helper.Logger.Information("Running...");
+        Helper.Logger.Information("Connecting...");
+        var bpm = new ButtplugManager();
+        await bpm.ConnectToServerAsync();
+        Helper.Logger.Information("Connected");
+
+        Helper.Logger.Information("Press CTRL + C to cancel. Running...");
         while (true)
         {
             var matches = GetMatching(pixelProvider);
             foreach (var match in matches)
                 foreach (var triggerAction in match.TriggerActions)
-                    triggerAction.Execute();
+                    await triggerAction.ExecuteAsync(bpm);
 
             await Task.Delay(500);
         }

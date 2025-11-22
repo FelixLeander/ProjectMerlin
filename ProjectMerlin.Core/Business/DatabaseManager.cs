@@ -8,8 +8,9 @@ namespace ProjectMerlin.Core.Business;
 /// </summary>
 public sealed class DatabaseManager : DbContext
 {
-    internal DbSet<MonitorConfig> MonitorConfigs => Set<MonitorConfig>();
-    internal DbSet<TriggerAction> TriggerActions => Set<TriggerAction>();
+    public DbSet<MonitorConfig> MonitorConfigs => Set<MonitorConfig>();
+    public DbSet<TriggerAction> TriggerActions => Set<TriggerAction>();
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlite($"Data Source=Database.db");
@@ -22,7 +23,7 @@ public sealed class DatabaseManager : DbContext
         context.Database.EnsureCreated();
     }
 
-    internal static async Task<List<MonitorConfig>> LoadMonitorConfigAsync()
+    public static async Task<List<MonitorConfig>> LoadEnaabledMonitorConfigAsync()
     {
         await using var context = new DatabaseManager();
         return await context.MonitorConfigs

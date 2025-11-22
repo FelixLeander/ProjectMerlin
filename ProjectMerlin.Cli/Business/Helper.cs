@@ -5,7 +5,7 @@ namespace ProjectMerlin.Cli.Business;
 
 internal static class Helper
 {
-    public static T? PopulateInstanceFromConsole<T>() where T : class, new() // type constraints not really reuired.
+    public static T PopulateInstanceFromConsole<T>() where T : class, new() // type constraints not really reuired.
     {
         var type = typeof(T);
         var instance = Activator.CreateInstance<T>();
@@ -43,6 +43,6 @@ internal static class Helper
             }
         }
 
-        return null;
+        return instance;
     }
 }
