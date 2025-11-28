@@ -30,13 +30,10 @@ public class MonitorConfig
     [Required]
     public int PosY { get; init; }
 
-    [Required]
-    public int ArgbInt { get; init; }
-
     public double Threhshold { get; init; } = 0.80;
 
     [NotMapped]
-    public Color Color { get => field == default ? Color.FromArgb(ArgbInt) : field; set; }
+    public Color Color { get; set; }
 
     /// <summary> Navigation property, by convention.</summary>
     //[Required]
