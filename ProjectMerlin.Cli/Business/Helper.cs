@@ -12,8 +12,6 @@ internal static class Helper
     {
         try
         {
-            Console.WriteLine("Also accepts HEX-Color.");
-
             var rawInput = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(rawInput))
                 return (true, null);
