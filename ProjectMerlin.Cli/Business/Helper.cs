@@ -6,14 +6,27 @@ namespace ProjectMerlin.Cli.Business;
 
 internal static class Helper
 {
-    internal sealed record InteractiveCliParser(Type TargetType, Func<(bool, object?)> InteractiveConvertLogic);
+    internal sealed record InteractiveCliParser(Type TargetType, Func<(bool Cancel, object? Result)> InteractiveConvertLogic);
 
-    public static readonly InteractiveCliParser DefaultLogic = new InteractiveCliParser(typeof(object), () =>
+    public static readonly InteractiveCliParser DefaultLogic = new(typeof(string), () =>
     {
-        return new { };
+        try
+        {
+            Console.WriteLine("Also accepts HEX-Color.");
+
+            var rawInput = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(rawInput))
+                return (true, null);
+
+            return (false, rawInput);
+        }
+        catch
+        {
+            return (false, null);
+        }
     });
 
-    public static readonly InteractiveCliParser HexColor = new InteractiveCliParser(typeof(Color), () =>
+    public static readonly InteractiveCliParser HexColor = new(typeof(Color), () =>
     {
         try
         {
@@ -24,11 +37,10 @@ internal static class Helper
                 return (true, null);
 
             var color = ColorTranslator.FromHtml(rawInput);
-            return (true, color);
+            return (false, color);
         }
         catch
         {
-            // TODO: Change return type to handle empty and cancel
             return (false, null);
         }
     });
@@ -49,26 +61,28 @@ internal static class Helper
         foreach (var pi in propertyInfos)
         {
             Console.WriteLine($"Enter a {pi.PropertyType.Name} for {pi.Name}.");
-            string? rawInput = null;
             while (true)
             {
                 var interactiveCliParser = customCliParsers.FirstOrDefault(f => f.TargetType == type) ?? DefaultLogic;
-                var result = interactiveCliParser.InteractiveConvertLogic.Invoke();
-                if (result == null)
+                var (cancel, result) = interactiveCliParser.InteractiveConvertLogic.Invoke();
+                if (cancel)
                 {
                     Console.Write($"{pi.Name} is required. Please enter a value. ");
                     continue;
                 }
 
+                if (result == null)
+                    break;
+
                 try
                 {
-                    var value = resultObject ?? Convert.ChangeType(rawInput, pi.PropertyType);
+                    var value = Convert.ChangeType(result, pi.PropertyType);
                     pi.SetValue(instance, value);
                     break;
                 }
                 catch
                 {
-                    Console.WriteLine($"The value '{rawInput}' is invalid for the type {pi.PropertyType.Name}. Try again.");
+                    Console.WriteLine($"The value is invalid for the type {pi.PropertyType.Name}. Try again.");
                 }
             }
         }
