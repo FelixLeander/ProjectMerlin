@@ -52,7 +52,7 @@ internal static class ConsoleMenues
                     {
                         var monitorManager = new MonitorManager();
                         await monitorManager.InitializeAsync();
-                        await monitorManager.Run(new LinuxGrep());
+                        await monitorManager.Run(new OsSpecific());
                     }
                     catch (Exception ex)
                     {
@@ -117,7 +117,7 @@ internal static class ConsoleMenues
                         monitorConfig.TriggerActions.AddRange(devices);
                         MonitorManager.AddMonitorConfig(monitorConfig);
                     }
-                    catch (ButtplugClientConnectorException ex)
+                    catch (ButtplugClientConnectorException)
                     {
                         Console.WriteLine("Connection to intiface failed.");
                         Console.WriteLine("Enusre intiface is running. Get is here: https://intiface.com/central/");

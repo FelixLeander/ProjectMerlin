@@ -11,7 +11,6 @@ public sealed class LinuxGrep : IPixelProvider
 {
     public Color? GetPixelColor(MonitorConfig monitorConfig)
     {
-        //return Color.Red; // TODO: REMOVE THIS LINE AFTER TESTING
         try
         {
             // DO NOT...I repeat DO NOT remove the triple backslashes...Don't ask. It's magic

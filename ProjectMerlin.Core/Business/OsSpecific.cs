@@ -1,35 +1,51 @@
+using ProjectMerlin.Core.Abstraction;
+using ProjectMerlin.Core.Models;
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
 namespace ProjectMerlin.Core.Business;
 
-internal static class OsSpecific
+public sealed class OsSpecific : IPixelProvider
 {
-    internal static async Task<Color> GetPixelAsync(int x, int y, CancellationToken cancellationToken = default)
+    private enum Os
+    {
+        None,
+        Windows,
+        LinuxGrep
+    }
+
+    private readonly Os os;
+    public OsSpecific()
     {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            return await LinuxGetPixelAsync(x, y, cancellationToken);
+            os = Os.LinuxGrep;
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            os = Os.Windows;
+        else
+            throw new Exception($"Unsupported OS: {RuntimeInformation.OSDescription}");
+    }
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            return await WindowsGetPixelAsync(x, y, cancellationToken);
+    public Color? GetPixelColor(MonitorConfig monitorConfig)
+    {
+        if (os == Os.LinuxGrep)
+            return LinuxGetPixel(monitorConfig.PosX, monitorConfig.PosY);
+
+        if (os == Os.Windows)
+            return WindowsGetPixel(monitorConfig.PosX, monitorConfig.PosY);
 
         throw new PlatformNotSupportedException($"'{RuntimeInformation.OSDescription}' isn't supported yet.");
     }
 
-    private static async Task<Color> WindowsGetPixelAsync(int x, int y, CancellationToken cancellationToken = default)
+    private static Color WindowsGetPixel(int x, int y)
     {
-        return await Task.Run(() =>
-        {
-            var nintZero = IntPtr.Zero;
-            var desktopDc = GetDC(nintZero);
-            var pixel = GetPixel(desktopDc, x, y);
-            _ = ReleaseDC(nintZero, desktopDc);
+        var nintZero = IntPtr.Zero;
+        var desktopDc = GetDC(nintZero);
+        var pixel = GetPixel(desktopDc, x, y);
+        _ = ReleaseDC(nintZero, desktopDc);
 
-            var pixelWithAlpha = (int)(pixel + 0xFF000000);
-            return Color.FromArgb(pixelWithAlpha);
-        }, cancellationToken);
-
+        var pixelWithAlpha = (int)(pixel + 0xFF000000);
+        return Color.FromArgb(pixelWithAlpha);
 
         // Gets the deviceContext for the desktops. IntPtr.Zero for all desktops
         [DllImport("user32.dll")]
@@ -44,10 +60,10 @@ internal static class OsSpecific
         static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
     }
 
-    private static async Task<Color> LinuxGetPixelAsync(int x, int y, CancellationToken cancellationToken = default)
+    private static Color LinuxGetPixel(int x, int y)
     {
         var process = Process.Start("grim", @$"-g ""{x},{y} 1x1"" - | convert - -format ""%[pixel:p{{0,0}}]"" info:");
-        var srgbText = await process.StandardOutput.ReadToEndAsync(cancellationToken);
+        var srgbText = process.StandardOutput.ReadToEnd();
 
         var openPos = srgbText.IndexOf('(') + 1;
         var closePos = srgbText.IndexOf(')', openPos);
